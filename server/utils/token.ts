@@ -20,19 +20,16 @@ interface ITokenOptions {
 const isProduction = process.env.NODE_ENV === "production";
 
 // create the tokens expiration time
-const accessTokenExpiration = parseInt(
-  process.env.ACCESS_TOKEN_EXPIRATION || "2m",
-  10
-);
-const refreshTokenExpiration = parseInt(
-  process.env.REFRESH_TOKEN_EXPIRATION || "7m",
-  10
-);
+const accessTokenExpiration: any =
+  Number(process.env.ACCESS_TOKEN_EXPIRATION) || 1;
+
+const refreshTokenExpiration: any =
+  Number(process.env.REFRESH_TOKEN_EXPIRATION) || 7;
 
 // cookies options
 export const accessTokenOptions: ITokenOptions = {
   expires: new Date(Date.now() + accessTokenExpiration * 60 * 1000),
-  maxAge: accessTokenExpiration * 60 * 1000,
+  maxAge: accessTokenExpiration * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: isProduction ? "none" : "lax",
   secure: isProduction,
@@ -40,7 +37,7 @@ export const accessTokenOptions: ITokenOptions = {
 
 export const refreshTokenOptions: ITokenOptions = {
   expires: new Date(Date.now() + refreshTokenExpiration * 60 * 1000),
-  maxAge: refreshTokenExpiration * 60 * 1000,
+  maxAge: refreshTokenExpiration * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: isProduction ? "none" : "lax",
   secure: isProduction,
@@ -55,14 +52,14 @@ export const signInWithCredentials = (
   const accessToken = jwt.sign(
     { user },
     process.env.SIGN_IN_ACCESS_SECRET_KEY as string,
-    { expiresIn: (process.env.ACCESS_TOKEN_EXPIRATION as any) || "1d" }
+    { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION as any}d` || "1d" }
   );
 
   //   generate unique refresh token when user logs in
   const refreshToken = jwt.sign(
     { user },
     process.env.SIGN_IN_REFRESH_SECRET_KEY as string,
-    { expiresIn: (process.env.REFRESH_TOKEN_EXPIRATION as any) || "7d" }
+    { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION as any}d` || "7d" }
   );
 
   //   save tokens in the response cookie

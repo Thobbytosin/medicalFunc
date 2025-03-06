@@ -1,13 +1,13 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-interface IDoctor extends Document {
+export interface IDoctor extends Document {
   name: string;
   email: string;
-  password: string;
-  profilePicture?: string;
+  securityAnswer: string;
   specialization: string;
-  experience: number;
+  experience: string;
   education: string[];
+  hospital: string;
   licenseNumber: string;
   certifications?: string[];
   availableDays: string[];
@@ -16,30 +16,31 @@ interface IDoctor extends Document {
   clinicAddress: string;
   city: string;
   state: string;
-  zipCode: string;
-  phone: string;
+  zipCode: number;
+  phone: number;
   altPhone?: string;
   ratings: number;
-  reviews: {
+  reviews?: {
     patientId: mongoose.Schema.Types.ObjectId;
     comment: string;
     rating: number;
     date: Date;
   }[];
-  appointments: mongoose.Schema.Types.ObjectId[];
+  appointments?: mongoose.Schema.Types.ObjectId[];
   maxPatientsPerDay: number;
   about?: string;
   thumbnail: { id: string; url: string };
+  verificationStatus: "Processing" | "Verified" | "Failed" | "Completed";
 }
 
 const doctorSchema: Schema<IDoctor> = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    profilePicture: { type: String },
+    securityAnswer: { type: String, required: true, select: false },
+    hospital: { type: String, required: true },
     specialization: { type: String, required: true },
-    experience: { type: Number, required: true },
+    experience: { type: String, required: true },
     education: [{ type: String, required: true }],
     licenseNumber: { type: String, required: true },
     certifications: [{ type: String }],
@@ -49,8 +50,8 @@ const doctorSchema: Schema<IDoctor> = new mongoose.Schema(
     clinicAddress: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    zipCode: { type: String, required: true },
-    phone: { type: String, required: true },
+    zipCode: { type: Number, required: true },
+    phone: { type: Number, required: true },
     altPhone: { type: String },
     ratings: { type: Number, default: 0 },
     reviews: [
@@ -71,6 +72,11 @@ const doctorSchema: Schema<IDoctor> = new mongoose.Schema(
         type: String,
       },
       url: { type: String },
+    },
+    verificationStatus: {
+      type: String,
+      enum: ["Processing", "Verified", "Failed", "Completed"],
+      default: "Processing",
     },
   },
   { timestamps: true }

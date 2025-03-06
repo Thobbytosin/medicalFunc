@@ -12,10 +12,7 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { sendMail } from "../utils/sendMail";
-import { Secret } from "jsonwebtoken";
 import { signInWithCredentials } from "../utils/token";
-import { name } from "ejs";
-// import ejs from 'ejs'
 
 dotenv.config();
 

@@ -12,6 +12,8 @@ export const isUserAuthenticated = catchAsyncError(
     // check if user is logged in (check and verify access token)
     const { access_token } = req.cookies;
 
+    console.log("AUTHENTICATION:", req.cookies);
+
     // if there is no access token
     if (!access_token)
       return next(new ErrorHandler("Access Denied: Login to proceed", 403));

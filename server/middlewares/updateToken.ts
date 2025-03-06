@@ -34,13 +34,19 @@ export const updateAccessToken = catchAsyncError(
     const accessToken = jwt.sign(
       { user },
       process.env.SIGN_IN_ACCESS_SECRET_KEY as string,
-      { expiresIn: (process.env.ACCESS_TOKEN_EXPIRATION as any) || "1d" }
+      {
+        expiresIn:
+          `${Number(process.env.ACCESS_TOKEN_EXPIRATION) as any}d` || "1d",
+      }
     );
 
     const refreshToken = jwt.sign(
       { user },
       process.env.SIGN_IN_REFRESH_SECRET_KEY as string,
-      { expiresIn: (process.env.REFRESH_TOKEN_EXPIRATION as any) || "7d" }
+      {
+        expiresIn:
+          `${Number(process.env.REFRESH_TOKEN_EXPIRATION) as any}d` || "7d",
+      }
     );
 
     res.cookie("access_token", accessToken, accessTokenOptions);

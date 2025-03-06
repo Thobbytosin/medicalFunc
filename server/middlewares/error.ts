@@ -7,14 +7,14 @@ const ErrorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  // console.log(err);
+  // console.log("ERROR MESSAGE:", err.message);
 
   err.statusCode = err.statusCode || 500;
   err.message = err.message || "Internal Server Error";
   err.name = err.name || "Server Error";
 
   if (err.name === "TokenExpiredError" || err.message === "jwt expired") {
-    const message = "Token has expired.";
+    const message = "Session has ended. Kindly Login to access this resource.";
     err = new ErrorHandler(message, 400);
   }
 
@@ -22,6 +22,12 @@ const ErrorMiddleware = (
     const message = "Invalid Token.";
     err = new ErrorHandler(message, 400);
   }
+
+  if (err.message.startsWith("Doctor validation failed:")) {
+    const message = "All doctor parameters must be entered";
+    err = new ErrorHandler(message, 400);
+  }
+
   res.status(err.statusCode).json({ success: false, message: err.message });
 };
 
