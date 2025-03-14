@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { styles } from "../../../styles/styles";
-import React, { useRef, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { CloseIcon, MenuIcon } from "../../../icons/icons";
 
-type Props = {};
+type Props = {
+  setOpenModal: (value: boolean) => void;
+  setMode: (value: string) => void;
+};
 
 const menuItems = [
   { name: "Home", link: "/" },
@@ -19,7 +22,7 @@ const menuItems = [
   { name: "Contact", link: "/contact" },
 ];
 
-const NavMobile = (props: Props) => {
+const NavMobile: FC<Props> = ({ setMode, setOpenModal }) => {
   const [openSidebar, setOpenSidebar] = useState<any>(undefined);
   const [openSubmenu, setOpenSubmenu] = useState<any>(false);
 
@@ -48,7 +51,7 @@ const NavMobile = (props: Props) => {
           <span className=" text-primary ">Trust</span> HealthCare
         </h1>
       </Link>
-
+      <div></div>
       <button
         title="Menu"
         className=" cursor-pointer"
@@ -62,7 +65,7 @@ const NavMobile = (props: Props) => {
 
       <div
         id="sidebar"
-        className={`fixed w-full h-screen top-0 left-0 z-[9999] transition-all duration-500 bg-black/40  ${
+        className={`fixed w-full min-h-screen top-0 left-0 z-[9999] transition-all duration-500 bg-black/40  ${
           openSidebar ? "-translate-y-[0%]" : "-translate-y-[100%]"
         }`}
       >
@@ -158,7 +161,18 @@ const NavMobile = (props: Props) => {
             </ul>
           </div>
 
-          <p className=" mt-6 ml-6 text-xs text-black dark:text-white text-start">
+          <button
+            onClick={() => {
+              setOpenSidebar(false);
+              setOpenModal(true);
+              setMode("login");
+            }}
+            className=" my-10 py-2 bg-primary text-white px-10 rounded-lg mx-auto w-fit cursor-pointer transition-all duration-700 hover:bg-transparent hover:text-primary hover:border hover:border-primary"
+          >
+            Sign In
+          </button>
+
+          <p className=" mt-6 ml-6 text-xs text-black  text-start">
             &copy; {new Date().getFullYear()} Trust HealthCare, All Rights
             Reserved
           </p>

@@ -1,60 +1,77 @@
-"use client";
-
 import CookiesConsent from "./components/global/CookiesConsent";
 import Header from "./components/global/Header";
-import PageHeading from "./components/global/PageHeading";
 import Search from "./components/global/search/Search";
 import Hero from "./components/home/Hero";
-import { motion } from "framer-motion";
+import Services from "./components/home/Services";
+import MeetDoctors from "./components/home/MeetDoctors";
+import Testimonials from "./components/home/Testimonials";
+import VideoSection from "./components/home/VideoSection";
+import NewsLetter from "./components/home/NewsLetter";
+import Footer from "./components/global/Footer";
+import { Metadata } from "next";
 
-export interface LoginOptions {
-  email: string;
-  password: string;
-}
-
-// Animation Variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+export const metadata: Metadata = {
+  title: "Trust Healthcare - Quality Medical Care You Can Rely On",
+  description:
+    "Trust Healthcare provides top-quality medical care, telemedicine services, and expert consultations. Book an appointment with our certified doctors today.",
+  keywords:
+    "healthcare, hospital, doctors, medical services, telemedicine, online consultation, patient care, Trust Healthcare",
+  icons: {
+    icon: "/logo.png", //Path relative to /public
+    shortcut: "/logo.png",
+  },
+  authors: [{ name: "Trust Healthcare Team" }],
+  alternates: {
+    canonical: "https://trusthealthcare.com",
+  },
+  openGraph: {
+    title: "Trust Healthcare - Your Trusted Medical Partner",
+    description:
+      "Get the best medical services, telemedicine consultations, and expert healthcare solutions at Trust Healthcare.",
+    url: "https://trusthealthcare.com",
+    siteName: "Trust Healthcare",
+    images: [
+      {
+        url: "/logo.png",
+        width: 800,
+        height: 600,
+        alt: "Trust Healthcare Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Trust Healthcare - Your Trusted Medical Partner",
+    description:
+      "Get the best medical services, telemedicine consultations, and expert healthcare solutions at Trust Healthcare.",
+    images: ["/logo.png"],
+  },
+  metadataBase: new URL("https://trusthealthcare.com"),
 };
 
 export default function Home() {
   return (
     <>
-      {/* FOR SEO */}
-      <PageHeading
-        title="Trust Healthcare - Quality Medical Care You Can Rely On"
-        description="Trust Healthcare provides top-quality medical care, telemedicine services, and expert consultations. Book an appointment with our certified doctors today."
-        keywords="healthcare, hospital, doctors, medical services, telemedicine, online consultation, patient care, Trust Healthcare"
-        author="Trust Healthcare Team"
-        ogTitle="Trust Healthcare - Your Trusted Medical Partner"
-        ogDescription="Get the best medical services, telemedicine consultations, and expert healthcare solutions at Trust Healthcare."
-        ogImage="/logo.png"
-        ogUrl="https://trusthealthcare.com"
-        twitterCard="summary_large_image"
-      />
-
       <Header />
 
-      <motion.div
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        <Hero />
-      </motion.div>
+      <Hero />
 
-      <motion.div
-        variants={fadeInUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        <Search />
-      </motion.div>
+      <Search />
 
-      <div className=" w-full h-[10000px]" />
+      <Services />
+
+      <MeetDoctors />
+
+      <Testimonials />
+
+      <VideoSection />
+
+      <NewsLetter />
+
+      <Footer />
+
       {/* cookies consent */}
       <CookiesConsent />
     </>

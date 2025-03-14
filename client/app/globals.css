@@ -5,12 +5,34 @@
   --color-secondary: #44960d;
   --color-text-primary: #404040;
   --color-text-secondary: #a7a7a7;
+  --color-text-light-gray: #b4b4b4;
 
   --font-poppins: Poppins, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   overflow-x: hidden;
+}
+
+.clippedImage {
+  clip-path: inset(0px 0px 37px 0px);
+
+  @media screen and (max-width: 768px) {
+    clip-path: inset(0px 0px 6px 0px);
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 ::-webkit-scrollbar {
@@ -63,5 +85,33 @@ body {
   }
   83.33% {
     opacity: 0.4;
+  }
+}
+
+.scale-btn-animation {
+  scale: 1.5;
+  animation: changeScale infinite 1s alternate ease-in-out;
+}
+
+@keyframes changeScale {
+  0%,
+  100% {
+    scale: 1.5;
+  }
+  50% {
+    scale: 1;
+  }
+}
+
+.animate-scroll {
+  animation: scrolling 20s linear infinite;
+}
+
+@keyframes scrolling {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
   }
 }

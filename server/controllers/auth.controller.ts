@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { sendMail } from "../utils/sendMail";
 import { signInWithCredentials } from "../utils/token";
+import { sendVerificationSMS } from "../utils/sendSms";
 
 dotenv.config();
 
@@ -62,6 +63,10 @@ export const registerUser = catchAsyncError(
 
     // try-catch block for the email
     try {
+      // send SMS
+      await sendVerificationSMS("2349167571188", verificationCode);
+
+      // send mail
       await sendMail({
         email: user.email,
         subject: "Account Verification",

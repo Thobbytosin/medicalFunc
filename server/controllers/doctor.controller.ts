@@ -220,9 +220,16 @@ export const getDoctorAdmin = catchAsyncError(
 //////////////////////////////////////////////////////////////////////////////////////////////// GET ALL DOCTORS (USER)
 export const getAllDoctorsList = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const doctors = await Doctor.find().select(
-      "-securityAnswer -phone -altPhone -hospital -clinicAddress"
-    );
+    const page = parseInt(req.params.page as string, 10) | 1;
+    const limit = parseInt(req.params.limit as string, 10) | 10;
+    const skip = (page - 1) * limit;
+
+    const totalDoctors = await Doctor.countDocuments();
+
+    const doctors = await Doctor.find()
+      .select("-securityAnswer -phone -altPhone -hospital -clinicAddress")
+      .skip(skip)
+      .limit(limit);
 
     if (!doctors) return next(new ErrorHandler("Error: Doctor not found", 404));
 
@@ -230,6 +237,7 @@ export const getAllDoctorsList = catchAsyncError(
       success: true,
       message: "Doctors Information retrieved",
       doctors,
+      totalPages: Math.ceil(totalDoctors / limit),
     });
   }
 );

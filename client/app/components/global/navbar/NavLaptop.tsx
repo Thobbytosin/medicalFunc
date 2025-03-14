@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { styles } from "../../../styles/styles";
-import React, { useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
-type Props = {};
+type Props = {
+  setOpenModal: (value: boolean) => void;
+  setMode: (value: string) => void;
+  activeIndex?: number;
+};
 
 const menuItems = [
   { name: "Home", link: "/" },
@@ -19,7 +23,7 @@ const menuItems = [
   { name: "Contact", link: "/contact" },
 ];
 
-const NavLaptop = (props: Props) => {
+const NavLaptop: FC<Props> = ({ setOpenModal, setMode, activeIndex }) => {
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const dropDownRef = useRef<HTMLUListElement>(null);
   const navRef = useRef<HTMLUListElement>(null);
@@ -117,7 +121,8 @@ const NavLaptop = (props: Props) => {
                   setActiveFocusedIndex(undefined);
                 }}
                 className={`flex items-center cursor-pointer hover:text-primary ${
-                  activeFocusedIndex === index
+                  (!activeIndex && activeFocusedIndex === index) ||
+                  activeIndex === index
                     ? "border-b-2 border-primary"
                     : ""
                 } duration-300 transition-all`}
@@ -142,14 +147,18 @@ const NavLaptop = (props: Props) => {
                   ref={dropDownRef}
                   role="menu"
                   onMouseLeave={() => setDropDownOpen(!dropDownOpen)}
-                  className=" absolute left-0 bg-primary rounded-md w-40 shadow-lg shadow-black/10 text-white mt-2 cursor-pointer transition-all duration-700"
+                  className=" absolute left-0 bg-gray-200 rounded-md w-40 shadow-lg shadow-black/10 text-text-primary mt-2 cursor-pointer transition-all duration-700"
                 >
-                  {item.submenu.map((subitem, index) => (
+                  {item.submenu.map((subitem, i) => (
                     <li
-                      key={index}
+                      key={i}
                       role="menuitem"
                       title={subitem.name}
-                      className="p-2.5 transition-all duration-700 hover:bg-white hover:text-black w-full border-b border-white"
+                      className={`p-2.5 transition-all duration-700 hover:bg-white hover:text-black w-full text-sm font-light ${
+                        i === item.submenu.length - 1
+                          ? "border-none"
+                          : "border-b border-white"
+                      }`}
                     >
                       <Link href={subitem.link}>{subitem.name}</Link>
                     </li>
@@ -167,7 +176,8 @@ const NavLaptop = (props: Props) => {
                   setActiveFocusedIndex(index);
                 }}
                 className={`focus:outline-none hover:text-primary transition-all ${
-                  activeFocusedIndex === index
+                  (!activeIndex && activeFocusedIndex === index) ||
+                  activeIndex === index
                     ? "border-b-2 border-primary"
                     : ""
                 }`}
@@ -185,6 +195,10 @@ const NavLaptop = (props: Props) => {
           title="Sign In"
           aria-label="Sign In"
           className="hidden md:block w-[140px] bg-primary text-center py-2 rounded-lg text-white text-[13px] cursor-pointer transition-all duration-500 hover:bg-primary/70"
+          onClick={() => {
+            setMode("login");
+            setOpenModal(true);
+          }}
         >
           Sign In
         </button>
@@ -192,6 +206,10 @@ const NavLaptop = (props: Props) => {
           title="Sign Up"
           aria-label="Sign Up"
           className="hidden lg:block w-[140px] border-primary border text-center py-2 rounded-lg text-primary text-[13px] cursor-pointer transition-all duration-500 hover:bg-gray-300 hover:border-none"
+          onClick={() => {
+            setMode("signup");
+            setOpenModal(true);
+          }}
         >
           Sign Up
         </button>

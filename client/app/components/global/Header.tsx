@@ -1,45 +1,54 @@
-import React, { useState } from "react";
+"use client";
+import React, { FC, useEffect, useState } from "react";
 import NavLaptop from "./navbar/NavLaptop";
 import NavMobile from "./navbar/NavMobile";
+import Modal from "./Modal";
 
-type Props = {};
+type Props = {
+  activeIndex?: number;
+};
 
-const Header = (props: Props) => {
+const Header: FC<Props> = ({ activeIndex }) => {
   const [sticky, setSticky] = useState("top");
+  const [openModal, setOpenModal] = useState(false);
+  const [mode, setMode] = useState("signup");
+  const [mounted, setMounted] = useState(false);
 
-  // // for sticky
-  // if (typeof window !== "undefined") {
-  //   window.addEventListener("scroll", () => {
-  //     if (window.scrollY > 180) {
-  //       setSticky(true);
-  //     } else {
-  //       setSticky(false);
-  //     }
-  //   });
-  // }
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 220) {
-        setSticky("show");
-      } else if (window.scrollY > 0 && window.scrollY < 220) {
-        setSticky("hide");
-      } else if (window.scrollY === 0) {
-        setSticky("top");
-      }
-    });
-  }
+  useEffect(() => {
+    setMounted(true);
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 220) {
+          setSticky("show");
+        } else if (window.scrollY > 0 && window.scrollY < 220) {
+          setSticky("hide");
+        } else if (window.scrollY === 0) {
+          setSticky("top");
+        }
+      });
+    }
+  }, [mounted]);
 
   return (
     <header
-      className={`fixed top-0 w-full left-0  transition-all duration-500  ${
+      id="header"
+      className={`fixed top-0 w-full left-0  transition-all duration-500 z-30 ${
         sticky === "top" && "shadow-none"
-      } ${sticky === "hide" && "-translate-y-[6rem]"} ${
+      } ${sticky === "hide" && "-translate-y-[6rem] z-30"} ${
         sticky === "show" &&
         "-translate-y-0 bg-white shadow-md md:shadow-lg z-30"
       }`}
     >
-      <NavLaptop />
-      <NavMobile />
+      <NavLaptop
+        activeIndex={activeIndex}
+        setOpenModal={setOpenModal}
+        setMode={setMode}
+      />
+      <NavMobile setOpenModal={setOpenModal} setMode={setMode} />
+      {openModal && (
+        <Modal mode={mode} setOpenModal={setOpenModal} setMode={setMode} />
+      )}
     </header>
   );
 };
