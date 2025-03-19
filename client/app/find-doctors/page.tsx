@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../components/global/Header";
-import DoctorsClient from "../components/doctors/Doctors";
 import { Metadata } from "next";
+import FindDoctors from "../components/doctors/FindDoctors";
 
 // SE0
 export const metadata: Metadata = {
@@ -50,7 +50,7 @@ export default function Doctors() {
     <>
       <Header activeIndex={2} />
 
-      <DoctorsClient />
+      <FindDoctors />
     </>
   );
 }

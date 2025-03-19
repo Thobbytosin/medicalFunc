@@ -11,7 +11,7 @@ export interface IDoctor extends Document {
   licenseNumber: string;
   certifications?: string[];
   availableDays: string[];
-  timeSlots: string[];
+  timeSlots: { [key: string]: string[] };
   holidays?: Date[];
   clinicAddress: string;
   city: string;

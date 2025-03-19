@@ -18,6 +18,12 @@ import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import KeyboardDoubleArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardDoubleArrowLeftOutlined";
+import KeyboardDoubleArrowRightOutlinedIcon from "@mui/icons-material/KeyboardDoubleArrowRightOutlined";
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 export {
   MenuIcon,
@@ -40,4 +46,10 @@ export {
   DoneOutlinedIcon,
   VisibilityOffOutlinedIcon,
   VisibilityOutlinedIcon,
+  KeyboardDoubleArrowLeftOutlinedIcon,
+  KeyboardDoubleArrowRightOutlinedIcon,
+  PlaceOutlinedIcon,
+  ExpandMoreOutlinedIcon,
+  SearchOutlinedIcon,
+  VerifiedIcon,
 };

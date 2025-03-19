@@ -18,7 +18,7 @@ const menuItems = [
   { name: "Consultation", link: "/services/consultation" },
   { name: "Medical Checkup", link: "/services/medical-check-up" },
 
-  { name: "Doctors", link: "/doctors" },
+  { name: "Find Doctors", link: "/find-doctors" },
   { name: "Contact", link: "/contact" },
 ];
 

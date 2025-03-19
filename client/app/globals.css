@@ -1,11 +1,16 @@
 @import "tailwindcss";
 
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-primary: #4200ff;
-  --color-secondary: #44960d;
+  --color-secondary: #01a400;
   --color-text-primary: #404040;
   --color-text-secondary: #a7a7a7;
   --color-text-light-gray: #b4b4b4;
+  --color-grayey: #787887;
 
   --font-poppins: Poppins, sans-serif;
 }
@@ -105,6 +110,10 @@ body {
 
 .animate-scroll {
   animation: scrolling 20s linear infinite;
+}
+
+.d {
+  background-image: url("../public//assets/banner.jpg");
 }
 
 @keyframes scrolling {

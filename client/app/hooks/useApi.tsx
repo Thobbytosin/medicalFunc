@@ -85,18 +85,8 @@ export function useMutateData<T>({
         method,
         url: `${SERVER_URI}${url}`,
         data,
+        withCredentials: true,
       };
-
-      if (headers) {
-        const accessToken = localStorage.getItem("access_token");
-        const refreshToken = localStorage.getItem("refresh_token");
-        if (!accessToken) throw new Error("User not authenticated");
-
-        config.headers = {
-          "access-token": accessToken,
-          "refresh-token": refreshToken,
-        };
-      }
 
       const response = await axios(config);
 

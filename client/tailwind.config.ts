@@ -20,7 +20,7 @@ const config: Config = {
         "staff-Dark-img": "url(/assets/staffDark.png)",
       },
       colors: {
-        primary: "#23BDEE",
+        primary: "#4200ff",
         secondary: "#0F172A",
         warning: "#ef4444",
         success: "#22c55e",

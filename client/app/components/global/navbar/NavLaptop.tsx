@@ -19,7 +19,7 @@ const menuItems = [
     ],
   },
 
-  { name: "Doctors", link: "/doctors" },
+  { name: "Find Doctors", link: "/find-doctors" },
   { name: "Contact", link: "/contact" },
 ];
 
