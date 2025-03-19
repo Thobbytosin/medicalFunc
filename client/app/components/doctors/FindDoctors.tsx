@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import DoctorsGrid from "./DoctorsGrid";
 import RevealWrapper, { fadeInDown } from "../global/RevealWrapper";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { dummyDoctors } from "../../constants/doctors";
 import { DoneOutlinedIcon } from "../../icons/icons";
 
 import DoctorCard, { Doctor } from "./DoctorCard";
@@ -24,7 +23,7 @@ const FindDoctors = (props: Props) => {
   const [activeSpecialization, setActiveSpecialization] =
     useState("General Physician");
   const [page, setPage] = useState<number>(1);
-  const [doctorsData, setDocotorsData] = useState<any>(dummyDoctors);
+  const [doctorsData, setDocotorsData] = useState<any>();
   const initalSearchFormValues = { location: "", parameter: "" };
   const [searchForm, setSearchForm] = useState<SearchForm>(
     initalSearchFormValues
@@ -50,22 +49,22 @@ const FindDoctors = (props: Props) => {
     }
   }, [router, params, pathname, activeSpecialization, page]);
 
-  const handleFilterChange = (newFilter: string) => {
-    const newParams = new URLSearchParams(params.toString());
-    newParams.set("filter", newFilter.toLowerCase());
+  // const handleFilterChange = (newFilter: string) => {
+  //   const newParams = new URLSearchParams(params.toString());
+  //   newParams.set("filter", newFilter.toLowerCase());
 
-    router.push(`${pathname}?${newParams}`);
+  //   router.push(`${pathname}?${newParams}`);
 
-    // handle the specialization change
-    const filteredData = dummyDoctors.filter(
-      (data) => data.specialization === newFilter
-    );
-    if (newFilter === "General Physician") {
-      setDocotorsData(dummyDoctors);
-    } else {
-      setDocotorsData(filteredData);
-    }
-  };
+  //   // handle the specialization change
+  //   const filteredData = dummyDoctors.filter(
+  //     (data) => data.specialization === newFilter
+  //   );
+  //   if (newFilter === "General Physician") {
+  //     setDocotorsData(dummyDoctors);
+  //   } else {
+  //     setDocotorsData(filteredData);
+  //   }
+  // };
 
   const handlePageChange = (newPage: number) => {
     const newParams = new URLSearchParams(params.toString());
