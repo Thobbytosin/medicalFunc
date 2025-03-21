@@ -23,6 +23,20 @@ body {
   overflow-x: hidden;
 }
 
+/* to remove the input type number toggler  */
+
+/* chrome, safari, edge, opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .clippedImage {
   clip-path: inset(0px 0px 37px 0px);
 

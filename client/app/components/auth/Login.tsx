@@ -1,32 +1,64 @@
+import { useMutateData } from "@/app/hooks/useApi";
 import {
-  CloseOutlinedIcon,
-  DoneOutlinedIcon,
   VisibilityOffOutlinedIcon,
   VisibilityOutlinedIcon,
 } from "../../../app/icons/icons";
-import React, { FC, useState } from "react";
+import React, { FC, FormEvent, useState } from "react";
+import { toast } from "sonner";
+import Loader from "../global/Loader";
 
 type Props = {
   setMode: (value: string) => void;
+  setOpenModal: (value: boolean) => void;
 };
 
-const Login: FC<Props> = ({ setMode }) => {
+const Login: FC<Props> = ({ setMode, setOpenModal }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<any>({});
+  const { mutate: loginUser, isPending } = useMutateData({
+    method: "POST",
+    mutationKey: "loginUser",
+    url: "/login",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  return (
-    <section className=" w-full p-8">
-      <h2 className=" text-text-primary text-xl md:text-2xl">
-        Sign in to your account
-      </h2>
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault();
 
-      <form className=" ">
+    loginUser(form, {
+      onSuccess: async (data: any) => {
+        toast.success("Welcome to Trust HealthCare!", {
+          description: data.message,
+          duration: 4000,
+        });
+
+        setOpenModal(false);
+      },
+      onError: (error: any) => {
+        toast.error(`Oops! ${error.response.data.message}`, {
+          description: "Something went wrong. Try again",
+          duration: 4000,
+        });
+      },
+    });
+  };
+
+  return (
+    <section className=" w-full p-8 relative">
+      {isPending && <Loader />}
+      <h2 className=" text-text-primary text-lg md:text-2xl font-medium">
+        Welcome Back
+      </h2>
+      <p className=" text-xs md:text-sm text-grayey font-light mb-8 md:mb-0">
+        Sign in to access your account
+      </p>
+
+      <form onSubmit={handleLogin}>
         {/* email */}
-        <div className="md:mt-8 mt-4 w-full ">
+        <div className="md:mt-8 mt-6 w-full ">
           <label
             htmlFor="email"
             className="block text-sm text-text-primary font-medium mb-1"
@@ -46,7 +78,7 @@ const Login: FC<Props> = ({ setMode }) => {
         </div>
 
         {/* password */}
-        <div className=" md:mt-8 mt-4 relative">
+        <div className=" md:mt-8 mt-6 relative">
           <label
             htmlFor="firstName"
             className="block text-sm text-text-primary font-medium mb-1"
@@ -92,7 +124,7 @@ const Login: FC<Props> = ({ setMode }) => {
           Sign In
         </button>
       </form>
-      <p className=" text-center text-text-primary font-normal">
+      <p className=" text-center text-text-primary font-normal md:text-base text-sm">
         Not Registered?{" "}
         <span
           title="Log In"

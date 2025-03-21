@@ -3,6 +3,7 @@ import catchAsyncError from "../middlewares/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import User, { IUser } from "../models/user.model";
 import {
+  createNewVerificationToken,
   createResetPasswordToken,
   createVerificationToken,
   isEmailValid,
@@ -12,7 +13,10 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { sendMail } from "../utils/sendMail";
-import { signInWithCredentials } from "../utils/token";
+import {
+  signInWithCredentials,
+  verificationTokenOptions,
+} from "../utils/token";
 import { sendVerificationSMS } from "../utils/sendSms";
 
 dotenv.config();
@@ -64,7 +68,7 @@ export const registerUser = catchAsyncError(
     // try-catch block for the email
     try {
       // send SMS
-      await sendVerificationSMS("2349167571188", verificationCode);
+      // await sendVerificationSMS("2349167571188", verificationCode);
 
       // send mail
       await sendMail({
@@ -74,12 +78,17 @@ export const registerUser = catchAsyncError(
         templateData: mailData,
       });
 
+      // save token in the response cookie
+      res.cookie(
+        "verification_token",
+        verificationToken,
+        verificationTokenOptions
+      );
+
       res.status(201).json({
         success: true,
         message:
           "A 6-digit verification code has been sent to your email address.",
-        verificationCode,
-        verificationToken,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -90,17 +99,16 @@ export const registerUser = catchAsyncError(
 //////////////////////////////////////////////////////////////////////////////////////////////// ACCOUNT ACTIVATION
 export const accountVerification = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { verificationCode, verificationToken, userEmail } = req.body;
+    const verificationToken = req.cookies.verification_token;
+    const { verificationCode } = req.body;
 
-    if (!verificationCode || !verificationToken || !userEmail) {
-      return next(new ErrorHandler("All fields are required", 403));
+    if (!verificationToken) {
+      return next(new ErrorHandler("Verification code has expired", 403));
     }
 
-    // check if use is already verified
-    const user = await User.findOne({ email: userEmail });
-
-    if (user && user.verified)
-      return next(new ErrorHandler("Account is already verified", 422));
+    if (!verificationCode) {
+      return next(new ErrorHandler("All fields are required", 403));
+    }
 
     const credentials: { user: IUser; verificationCode: string } = jwt.verify(
       verificationToken,
@@ -108,7 +116,9 @@ export const accountVerification = catchAsyncError(
     ) as { user: IUser; verificationCode: string };
 
     if (credentials.verificationCode !== verificationCode) {
-      return next(new ErrorHandler("Access Denied: En verification code", 403));
+      return next(
+        new ErrorHandler("Access Denied: Invalid Verification code", 403)
+      );
     }
 
     const { name, email, password } = credentials.user;
@@ -120,7 +130,79 @@ export const accountVerification = catchAsyncError(
 
     await User.create({ name, email, password, verified: true });
 
-    res.status(201).json({ success: true, message: "Account created" });
+    const user = await User.findOne({ email });
+
+    if (!user) return next(new ErrorHandler("Error Proccessing User", 404));
+
+    // data to be sent to the email
+    const mailData = { name: user.name };
+
+    try {
+      await sendMail({
+        email: user.email,
+        subject: "Welcome Message",
+        templateData: mailData,
+        templateName: "welcome-email.ejs",
+      });
+
+      res
+        .status(201)
+        .json({ success: true, message: "Account Verification Successful!" });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 404));
+    }
+  }
+);
+
+/////////////////////////////////////////////////////////////////////////////////////////////// RESEND VERIFICATION CODE
+export const resendVerificationCode = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const verificationToken = req.cookies.verification_token;
+
+    const credentials: { user: IUser; verificationCode: string } = jwt.verify(
+      verificationToken,
+      process.env.JWT_VERIFICATION_SECRET_KEY as string
+    ) as { user: IUser; verificationCode: string };
+
+    // if there is no credentials (i.e token has expired). it goes to the error middleware
+
+    const user = credentials.user;
+
+    // generate a new verification code
+    const { newVerificationCode, newVerificationToken } =
+      createNewVerificationToken(user);
+
+    // data to be sent to the email
+    const mailData = { name: user.name, newVerificationCode };
+
+    // try-catch block for the email
+    try {
+      // send SMS
+      // await sendVerificationSMS("2349167571188", verificationCode);
+
+      // send mail
+      await sendMail({
+        email: user.email,
+        subject: "Re:Account Verification - New Verification Code",
+        templateName: "verification-email.ejs", // generate a new template
+        templateData: mailData,
+      });
+
+      // save token in the response cookie
+      res.cookie(
+        "verification_token",
+        newVerificationToken,
+        verificationTokenOptions
+      );
+
+      res.status(201).json({
+        success: true,
+        message:
+          "A new 6-digit verification code has been re-sent to your email address.",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
 );
 

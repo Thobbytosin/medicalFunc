@@ -10,7 +10,6 @@ interface IUserNoPassword {
 }
 
 interface ITokenOptions {
-  expires: Date;
   maxAge: number;
   httpOnly: boolean;
   sameSite: "none" | "lax" | "strict";
@@ -28,7 +27,6 @@ const refreshTokenExpiration: any =
 
 // cookies options
 export const accessTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + accessTokenExpiration * 60 * 1000),
   maxAge: accessTokenExpiration * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: isProduction ? "none" : "lax",
@@ -36,8 +34,14 @@ export const accessTokenOptions: ITokenOptions = {
 };
 
 export const refreshTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + refreshTokenExpiration * 60 * 1000),
   maxAge: refreshTokenExpiration * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: isProduction ? "none" : "lax",
+  secure: isProduction,
+};
+
+export const verificationTokenOptions: ITokenOptions = {
+  maxAge: 4 * 60 * 1000, // 4 miuntes
   httpOnly: true,
   sameSite: isProduction ? "none" : "lax",
   secure: isProduction,

@@ -5,6 +5,7 @@ import {
   getUserData,
   loginUser,
   registerUser,
+  resendVerificationCode,
   resetPassword,
   signOut,
 } from "../controllers/auth.controller";
@@ -15,6 +16,7 @@ const userRouter = Router();
 
 userRouter.post("/signup", registerUser);
 userRouter.post("/account-verification", accountVerification);
+userRouter.post("/resend-verification-code", resendVerificationCode);
 userRouter.post("/login", loginUser);
 userRouter.post("/forgot-password", forgotPassword);
 userRouter.post("/reset-password", resetPassword);

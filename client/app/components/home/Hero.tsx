@@ -9,7 +9,6 @@ import {
 import { motion } from "framer-motion";
 import { styles } from "@/app/styles/styles";
 import RevealWrapper from "../global/RevealWrapper";
-import { useSearchParams } from "next/navigation";
 
 type Props = {};
 

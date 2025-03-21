@@ -2,13 +2,14 @@
 import { styles } from "../../../app/styles/styles";
 import React from "react";
 import SectionHeading from "../global/SectionHeading";
-import { dummyDoctors } from "@/app/constants/doctors";
 import Ratings from "../global/Ratings";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import RevealWrapper from "../global/RevealWrapper";
 
 type Props = {};
+
+const dummyDoctors: any[] = [];
 
 const MeetDoctors = (props: Props) => {
   return (

@@ -1,10 +1,14 @@
+import { useMutateData } from "@/app/hooks/useApi";
 import {
   CloseOutlinedIcon,
   DoneOutlinedIcon,
   VisibilityOffOutlinedIcon,
   VisibilityOutlinedIcon,
 } from "../../../app/icons/icons";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
+import { toast } from "sonner";
+import Image from "next/image";
+import Loader from "../global/Loader";
 
 type Props = {
   setMode: (value: string) => void;
@@ -16,6 +20,11 @@ const Signup: FC<Props> = ({ setMode }) => {
   const [form, setForm] = useState<any>({});
   const [isPasswordChanging, setIsPasswordChanging] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const { mutate: registerUser, isPending } = useMutateData<any>({
+    mutationKey: "registerUser",
+    method: "POST",
+    url: "/signup",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPasswordChanging(false);
@@ -29,11 +38,45 @@ const Signup: FC<Props> = ({ setMode }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  return (
-    <section className=" w-full p-8">
-      <h2 className=" text-text-primary text-2xl">Sign up for account</h2>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-      <form className=" ">
+    registerUser(
+      {
+        name: form.firstName.trim() + " " + form.lastName.trim(),
+        email: form.email,
+        password: form.password,
+      },
+      {
+        onSuccess: async (data: any) => {
+          toast.success("Welcome to Trust Healthcare!", {
+            description: data.message,
+            duration: 4000,
+          });
+
+          setMode("verification");
+        },
+        onError: (error: any) => {
+          toast.error(`Oops! ${error.response.data.message}`, {
+            description: "Something went wrong. Try again",
+            duration: 4000,
+          });
+        },
+      }
+    );
+  };
+
+  return (
+    <section className=" w-full h-[580px] overflow-y-scroll md:overflow-hidden px-8 py-4 md:py-12 relative">
+      {isPending && <Loader />}
+
+      <h2 className=" text-text-primary text-lg md:text-2xl font-medium">
+        Register Your Account
+      </h2>
+      <p className=" text-xs md:text-sm text-grayey font-light">
+        Sign up to create a new account
+      </p>
+      <form onSubmit={handleSubmit}>
         {/* first and last name */}
         <div className=" md:flex md:gap-10 justify-between mt-8 ">
           {/* first name */}
@@ -52,7 +95,7 @@ const Signup: FC<Props> = ({ setMode }) => {
               placeholder="First Name"
               required
               onChange={handleChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
+              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[175px] lg:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
             />
           </div>
 
@@ -72,7 +115,7 @@ const Signup: FC<Props> = ({ setMode }) => {
               placeholder="Last Name"
               required
               onChange={handleChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full  md:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
+              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full  md:w-[175px] lg:w-[205px]  rounded-lg text-sm outline-none text-[#9A9A9A]"
             />
           </div>
         </div>
@@ -115,7 +158,7 @@ const Signup: FC<Props> = ({ setMode }) => {
               placeholder="Password"
               required
               onChange={handlePasswordChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
+              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[175px] lg:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
             />
             <>
               {showPassword ? (
@@ -154,7 +197,7 @@ const Signup: FC<Props> = ({ setMode }) => {
               placeholder="Confirm Password"
               required
               onChange={handlePasswordChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
+              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[175px] lg:w-[205px]  rounded-lg text-sm outline-none text-[#9A9A9A]"
             />
             <>
               {showConfirmPassword ? (
@@ -272,13 +315,30 @@ const Signup: FC<Props> = ({ setMode }) => {
 
         {/* button */}
         <button
+          disabled={
+            form?.password?.length < 8 ||
+            form?.password !== form?.confirmPassword ||
+            !form?.password?.match(/[a-zA-Z]/) ||
+            !form?.password?.match(/[0-9]/)
+          }
           type="submit"
-          className="my-6 mx-auto flex justify-self-center w-[144px] py-2 bg-primary text-white text-center rounded-lg cursor-pointer justify-center text-sm transition-all duration-700 hover:bg-transparent hover:text-primary hover:border hover:border-primary "
+          className={`mx-auto flex justify-self-center w-[144px] py-2  text-center rounded-lg my-4 ${
+            form?.firstName?.trim().length > 1 &&
+            form?.lastName?.trim().length > 1 &&
+            form?.email?.trim().length > 1 &&
+            form?.password?.length >= 8 &&
+            form?.password === form?.confirmPassword &&
+            form?.password?.match(/[a-zA-Z]/) &&
+            form?.password?.match(/[0-9]/) &&
+            isChecked
+              ? "bg-primary text-white cursor-pointer transition-all duration-300 hover:bg-transparent hover:text-primary hover:border hover:border-primary"
+              : "cursor-not-allowed bg-gray-300 opacity-50"
+          } justify-center text-sm  `}
         >
           Sign Up
         </button>
       </form>
-      <p className=" text-center text-text-primary font-normal">
+      <p className=" text-center text-text-primary font-normal md:text-base text-sm">
         Already Have an Account?{" "}
         <span
           title="Log In"
