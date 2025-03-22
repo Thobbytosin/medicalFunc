@@ -5,61 +5,64 @@ import {
   VisibilityOffOutlinedIcon,
   VisibilityOutlinedIcon,
 } from "../../../app/icons/icons";
-import React, { FC, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
-import Image from "next/image";
 import Loader from "../global/Loader";
 
 type Props = {
   setMode: (value: string) => void;
 };
 
-const Signup: FC<Props> = ({ setMode }) => {
+type ResetForm = {
+  resetCode: string;
+  password: string;
+  confirmPassword: string;
+};
+
+const ResetPassword = ({ setMode }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [form, setForm] = useState<any>({});
-  const [isPasswordChanging, setIsPasswordChanging] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const { mutate: registerUser, isPending } = useMutateData<any>({
-    mutationKey: "registerUser",
-    method: "POST",
-    url: "/signup",
+  const [form, setForm] = useState<ResetForm>({
+    password: "",
+    resetCode: "",
+    confirmPassword: "",
   });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsPasswordChanging(false);
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [isPasswordChanging, setIsPasswordChanging] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPasswordChanging(true);
-    setIsChecked(false);
 
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const { mutate: resetPassword, isPending } = useMutateData({
+    method: "POST",
+    mutationKey: "resetPassword",
+    url: "/reset-password",
+  });
+
+  const handleReset = (e: React.FormEvent) => {
     e.preventDefault();
 
-    registerUser(
+    resetPassword(
+      { resetCode: form.resetCode, password: form.password },
       {
-        name: form.firstName.trim() + " " + form.lastName.trim(),
-        email: form.email,
-        password: form.password,
-      },
-      {
-        onSuccess: async (data: any) => {
-          toast.success("Welcome to Trust Healthcare!", {
+        onSuccess: (data: any) => {
+          toast.success("Password Reset Successful", {
             description: data.message,
             duration: 4000,
           });
 
-          setMode("verification");
+          setMode("login");
         },
         onError: (error: any) => {
           toast.error(`Oops! ${error.response.data.message}`, {
             description: "Something went wrong. Try again",
-            duration: 4000,
+            // duration: 20000,
           });
         },
       }
@@ -67,98 +70,55 @@ const Signup: FC<Props> = ({ setMode }) => {
   };
 
   return (
-    <section className=" w-full h-[580px] overflow-y-scroll md:overflow-hidden px-8 py-4 md:py-12 relative">
+    <section className=" w-full  mx-auto p-8 flex flex-col justify-center items-center overflow-clip relative">
       {isPending && <Loader />}
-
-      <h2 className=" text-text-primary text-lg md:text-2xl font-medium">
-        Register Your Account
+      <h2 className=" text-text-primary text-center text-2xl font-medium ">
+        Reset Password
       </h2>
-      <p className=" text-xs md:text-sm text-grayey font-light">
-        Sign up to create a new account
+      <p className=" text-sm text-grayey font-light text-center mt-1">
+        Enter the reset code sent to your email and your new password to set a
+        new password.
       </p>
-      <form onSubmit={handleSubmit}>
-        {/* first and last name */}
-        <div className=" md:flex md:gap-10 justify-between mt-8 ">
-          {/* first name */}
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-sm text-text-primary font-medium mb-1"
-            >
-              First Name
-            </label>
-            <input
-              aria-label="first name"
-              id="firstName"
-              name="firstName"
-              type="text"
-              placeholder="First Name"
-              required
-              onChange={handleChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[175px] lg:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
-            />
-          </div>
 
-          {/* last name */}
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-sm text-text-primary font-medium mb-1 mt-4 md:mt-0"
-            >
-              Last Name
-            </label>
-            <input
-              aria-label="last name"
-              id="lastName"
-              name="lastName"
-              type="text"
-              placeholder="Last Name"
-              required
-              onChange={handleChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full  md:w-[175px] lg:w-[205px]  rounded-lg text-sm outline-none text-[#9A9A9A]"
-            />
-          </div>
-        </div>
-
-        {/* email */}
-        <div className="md:mt-8 mt-4 w-full ">
+      <form onSubmit={handleReset} className=" w-full mt-6">
+        {/* reset code */}
+        <div>
           <label
-            htmlFor="email"
+            htmlFor="resetCode"
             className="block text-sm text-text-primary font-medium mb-1"
           >
-            Email Address
+            Reset Code
           </label>
           <input
-            aria-label="email input"
-            id="email"
-            name="email"
-            type="email"
-            placeholder="Email Address"
+            aria-label="reset code"
+            id="resetCode"
+            name="resetCode"
+            type="text"
+            placeholder="Reset Code"
             required
             onChange={handleChange}
-            className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 rounded-lg text-sm outline-none text-[#9A9A9A] w-full"
+            className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full  rounded-lg text-sm outline-none text-[#9A9A9A]"
           />
         </div>
-
         {/* password and confirm password */}
-        <div className=" md:flex gap-10 justify-between ">
+        <div className=" w-full">
           {/* password */}
-          <div className=" md:mt-8 mt-4 relative">
+          <div className=" md:mt-6 mt-4 relative">
             <label
               htmlFor="password"
               className="block text-sm text-text-primary font-medium mb-1"
             >
-              Password
+              New Password
             </label>
             <input
               aria-label="password input"
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder="New Password"
               required
               onChange={handlePasswordChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[175px] lg:w-[205px] rounded-lg text-sm outline-none text-[#9A9A9A]"
+              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full  rounded-lg text-sm outline-none text-[#9A9A9A]"
             />
             <>
               {showPassword ? (
@@ -182,22 +142,22 @@ const Signup: FC<Props> = ({ setMode }) => {
           </div>
 
           {/* confirm password */}
-          <div className=" md:mt-8 mt-4 relative">
+          <div className=" md:mt-6 mt-4 relative">
             <label
-              htmlFor="confirmPassword"
+              htmlFor="firstName"
               className="block text-sm text-text-primary font-medium mb-1"
             >
-              Confirm Password
+              New Confirm Password
             </label>
             <input
               aria-label="confirm password"
               id="confirmPassword"
               name="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm Password"
+              placeholder="New Confirm Password"
               required
               onChange={handlePasswordChange}
-              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full md:w-[175px] lg:w-[205px]  rounded-lg text-sm outline-none text-[#9A9A9A]"
+              className="bg-[#F8F7F7] border border-[#DCD7D7] p-2 w-full   rounded-lg text-sm outline-none text-[#9A9A9A]"
             />
             <>
               {showConfirmPassword ? (
@@ -287,70 +247,34 @@ const Signup: FC<Props> = ({ setMode }) => {
           </div>
         ) : null}
 
-        {/* terms and conditions */}
-        {form?.password?.length >= 8 &&
-          form?.password === form?.confirmPassword &&
-          form?.password?.match(/[a-zA-Z]/) &&
-          form?.password?.match(/[0-9]/) && (
-            <div className=" flex items-center gap-4 mt-6">
-              <div
-                className={`w-[20px] h-[20px] border border-[#545454] cursor-pointer text-white flex justify-center items-center ${
-                  isChecked ? "bg-primary" : "bg-transparent"
-                }`}
-                onClick={() => {
-                  setIsPasswordChanging(false);
-                  setIsChecked((prev) => !prev);
-                }}
-              >
-                {isChecked && <DoneOutlinedIcon fontSize="small" />}
-              </div>
-              <p className="text-sm">
-                I accept all{" "}
-                <span className=" cursor-pointer text-primary">
-                  terms and conditions
-                </span>
-              </p>
-            </div>
-          )}
-
         {/* button */}
         <button
-          disabled={
-            form?.password?.length < 8 ||
-            form?.password !== form?.confirmPassword ||
-            !form?.password?.match(/[a-zA-Z]/) ||
-            !form?.password?.match(/[0-9]/)
-          }
           type="submit"
-          className={`mx-auto flex justify-self-center w-[144px] py-2  text-center rounded-lg my-4 ${
-            form?.firstName?.trim().length > 1 &&
-            form?.lastName?.trim().length > 1 &&
-            form?.email?.trim().length > 1 &&
+          className={`my-6 mx-auto flex justify-self-center w-full py-2  text-center rounded-lg  justify-center text-sm   ${
             form?.password?.length >= 8 &&
             form?.password === form?.confirmPassword &&
             form?.password?.match(/[a-zA-Z]/) &&
             form?.password?.match(/[0-9]/) &&
-            isChecked
-              ? "bg-primary text-white cursor-pointer transition-all duration-300 hover:bg-transparent hover:text-primary hover:border hover:border-primary"
+            form?.resetCode?.trim().length >= 1
+              ? "cursor-pointer bg-primary text-white hover:text-primary hover:border hover:border-primary transition-all duration-700 hover:bg-transparent "
               : "cursor-not-allowed bg-gray-300 opacity-50"
-          } justify-center text-sm  `}
+          }`}
         >
-          Sign Up
+          Submit
         </button>
       </form>
-      <p className=" text-center text-text-primary font-normal md:text-base text-sm">
-        Already Have an Account?{" "}
-        <span
-          title="Log In"
-          aria-label="Log In"
-          onClick={() => setMode("login")}
-          className=" cursor-pointer text-primary font-medium transition-all duration-700 hover:underline"
-        >
-          Log In
-        </span>
-      </p>
+
+      <button
+        title="Back to sign in"
+        aria-label="Back to sign in"
+        type="button"
+        onClick={() => setMode("login")}
+        className=" mt-2 cursor-pointer text-primary underline font-medium"
+      >
+        Back to Sign in
+      </button>
     </section>
   );
 };
 
-export default Signup;
+export default ResetPassword;

@@ -97,9 +97,13 @@ export function useMutateData<T>({
     },
     onError: (error: any) => {
       if (axios.isAxiosError(error) && error.response) {
-        console.error(
+        console.log(
           "Backend Error Message:",
           error.response.data?.message || "No error message from server"
+        );
+        console.log(
+          "Backend Error Details:",
+          error.response.data || "No error message from server"
         );
         throw new Error(error.response.data?.message || "API request failed");
       }

@@ -3,7 +3,6 @@ import catchAsyncError from "../middlewares/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import User, { IUser } from "../models/user.model";
 import {
-  createNewVerificationToken,
   createResetPasswordToken,
   createVerificationToken,
   isEmailValid,
@@ -14,6 +13,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { sendMail } from "../utils/sendMail";
 import {
+  resetTokenOptions,
   signInWithCredentials,
   verificationTokenOptions,
 } from "../utils/token";
@@ -157,10 +157,13 @@ export const accountVerification = catchAsyncError(
 /////////////////////////////////////////////////////////////////////////////////////////////// RESEND VERIFICATION CODE
 export const resendVerificationCode = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const verificationToken = req.cookies.verification_token;
+    const oldVerificationToken = req.cookies.verification_token;
+
+    if (!oldVerificationToken)
+      return next(new ErrorHandler("Session has expired. Try Again", 403));
 
     const credentials: { user: IUser; verificationCode: string } = jwt.verify(
-      verificationToken,
+      oldVerificationToken,
       process.env.JWT_VERIFICATION_SECRET_KEY as string
     ) as { user: IUser; verificationCode: string };
 
@@ -169,11 +172,11 @@ export const resendVerificationCode = catchAsyncError(
     const user = credentials.user;
 
     // generate a new verification code
-    const { newVerificationCode, newVerificationToken } =
-      createNewVerificationToken(user);
+    const { verificationCode, verificationToken } =
+      createVerificationToken(user);
 
     // data to be sent to the email
-    const mailData = { name: user.name, newVerificationCode };
+    const mailData = { name: user.name, verificationCode: verificationCode };
 
     // try-catch block for the email
     try {
@@ -183,7 +186,7 @@ export const resendVerificationCode = catchAsyncError(
       // send mail
       await sendMail({
         email: user.email,
-        subject: "Re:Account Verification - New Verification Code",
+        subject: "Resent Verification Code",
         templateName: "verification-email.ejs", // generate a new template
         templateData: mailData,
       });
@@ -191,7 +194,7 @@ export const resendVerificationCode = catchAsyncError(
       // save token in the response cookie
       res.cookie(
         "verification_token",
-        newVerificationToken,
+        verificationToken, // new verification token
         verificationTokenOptions
       );
 
@@ -265,12 +268,13 @@ export const forgotPassword = catchAsyncError(
         templateData: mailData,
       });
 
+      // save token in the response cookie
+      res.cookie("reset_token", resetToken, resetTokenOptions);
+
       res.status(200).json({
         success: true,
         message:
           "A password reset code has been sent to your email address. This code is valid for 4 minutes.",
-        resetCode,
-        resetToken,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -281,18 +285,19 @@ export const forgotPassword = catchAsyncError(
 //////////////////////////////////////////////////////////////////////////////////////////////// RESET PASSWORD
 export const resetPassword = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { resetCode, resetToken, email, password } = req.body;
+    const resetToken = req.cookies.reset_token;
+    const { resetCode, password } = req.body;
 
-    if (!resetCode || !resetToken || !email || !password)
+    if (!resetToken)
+      return next(new ErrorHandler("Session has expired. Try Again", 404));
+
+    if (!resetCode || !password)
       return next(new ErrorHandler("All fields are required", 403));
 
     const credentials = jwt.verify(
       resetToken,
       process.env.JWT_RESET_SECRET_KEY as string
     ) as { user: any; resetCode: string };
-
-    if (credentials.user.email !== email)
-      return next(new ErrorHandler("Mismatch email address", 422));
 
     // check if code is equal to the reset code stored in  backend
     if (credentials.resetCode !== resetCode)
@@ -313,6 +318,9 @@ export const resetPassword = catchAsyncError(
 
     // encrypt password
     const hashedPassword = bcryptjs.hashSync(password, 10);
+
+    // set the user last password reset time
+    user.lastPasswordReset = new Date();
 
     // set the password as the new user password
     user.password = hashedPassword;

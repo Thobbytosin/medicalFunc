@@ -11,6 +11,7 @@ export interface IUser extends Document {
   role: ("user" | "patient" | "doctor" | "administrator")[];
   verified: boolean;
   lastLogin: Date;
+  lastPasswordReset: Date;
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema(
@@ -36,6 +37,9 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     lastLogin: {
       type: Date,
       default: Date.now(),
+    },
+    lastPasswordReset: {
+      type: Date,
     },
     role: {
       type: [String],
