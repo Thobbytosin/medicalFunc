@@ -45,16 +45,16 @@ export const createResetPasswordToken = (user: any) => {
   return { resetCode, resetToken };
 };
 
-export const createNewVerificationToken = (user: any) => {
-  const newVerificationCode = Math.floor(
-    100000 + Math.random() * 900000
-  ).toString(); // generates random 6 digit code
+// export const createNewVerificationToken = (user: any) => {
+//   const verificationCode = Math.floor(
+//     100000 + Math.random() * 900000
+//   ).toString(); // generates random 6 digit code
 
-  const newVerificationToken = jwt.sign(
-    { user, newVerificationCode },
-    process.env.JWT_VERIFICATION_SECRET_KEY as string,
-    { expiresIn: "5m" }
-  );
+//   const verificationToken = jwt.sign(
+//     { user, verificationCode },
+//     process.env.JWT_VERIFICATION_SECRET_KEY as string,
+//     { expiresIn: "5m" }
+//   );
 
-  return { newVerificationCode, newVerificationToken };
-};
+//   return { verificationCode, verificationToken };
+// };

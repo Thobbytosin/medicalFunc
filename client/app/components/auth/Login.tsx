@@ -80,7 +80,7 @@ const Login: FC<Props> = ({ setMode, setOpenModal }) => {
         {/* password */}
         <div className=" md:mt-8 mt-6 relative">
           <label
-            htmlFor="firstName"
+            htmlFor="password"
             className="block text-sm text-text-primary font-medium mb-1"
           >
             Password
@@ -124,16 +124,26 @@ const Login: FC<Props> = ({ setMode, setOpenModal }) => {
           Sign In
         </button>
       </form>
+      <button
+        type="button"
+        title="Forgot Password"
+        aria-label="Forgot Password"
+        onClick={() => setMode("forgot-password")}
+        className=" cursor-pointer flex justify-self-center mb-6 text-center text-primary font-normal md:text-base text-sm transition-all duration-700 hover:underline"
+      >
+        Forgot Password?
+      </button>
       <p className=" text-center text-text-primary font-normal md:text-base text-sm">
         Not Registered?{" "}
-        <span
-          title="Log In"
-          aria-label="Log In"
-          className=" cursor-pointer text-primary font-medium transition-all duration-700 hover:underline"
+        <button
+          title="Sign Up"
+          type="button"
+          aria-label="Sign Up"
+          className="inline cursor-pointer text-primary font-medium transition-all duration-700 hover:underline"
           onClick={() => setMode("signup")}
         >
           Sign Up
-        </span>
+        </button>
       </p>
     </section>
   );

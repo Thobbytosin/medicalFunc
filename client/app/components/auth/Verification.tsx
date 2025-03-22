@@ -111,9 +111,37 @@ const Verification: FC<Props> = ({ setMode }) => {
     );
   };
 
+  const { mutate: resendCode, isPending: resendPending } = useMutateData({
+    method: "POST",
+    mutationKey: "resendCode",
+    url: "/resend-verification-code",
+  });
+
+  // handle resend code
+  const handleResend = () => {
+    resendCode(
+      {},
+      {
+        onSuccess: (data: any) => {
+          toast.success(data.message, {
+            description: "Enter the code to proceed.",
+            duration: 4000,
+          });
+        },
+        onError: (error: any) => {
+          toast.error(`Oops! ${error.response.data.message}`, {
+            description: "Something went wrong. Try again",
+            duration: 4000,
+          });
+        },
+      }
+    );
+  };
+
   return (
     <section className=" w-full md:w-[80%] mx-auto p-8 flex flex-col justify-center items-center overflow-clip relative">
       {isPending && <Loader />}
+      {resendPending && <Loader />}
 
       <h2 className=" text-text-primary text-center text-2xl font-medium mb-4">
         Account Verification
@@ -158,10 +186,25 @@ const Verification: FC<Props> = ({ setMode }) => {
       </button>
       <p className=" text-center text-sm md:text-base mt-8">
         Didn’t get the code?{" "}
-        <span className=" cursor-pointer text-primary transition-all duration-500 hover:underline">
+        <button
+          aria-label="Resend Button"
+          type="button"
+          onClick={handleResend}
+          className=" inline cursor-pointer text-primary transition-all duration-500 hover:underline"
+        >
           Resend
-        </span>
+        </button>
       </p>
+
+      <button
+        title="Back to sign in"
+        aria-label="Back to sign in"
+        type="button"
+        onClick={() => setMode("signup")}
+        className=" mt-4 cursor-pointer text-primary underline font-medium"
+      >
+        Back to Sign Up
+      </button>
     </section>
   );
 };

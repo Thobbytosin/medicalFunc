@@ -47,6 +47,13 @@ export const verificationTokenOptions: ITokenOptions = {
   secure: isProduction,
 };
 
+export const resetTokenOptions: ITokenOptions = {
+  maxAge: 4 * 60 * 1000, // 4 miuntes
+  httpOnly: true,
+  sameSite: isProduction ? "none" : "lax",
+  secure: isProduction,
+};
+
 export const signInWithCredentials = (
   user: IUserNoPassword,
   statusCode: number,
